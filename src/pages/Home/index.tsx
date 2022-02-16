@@ -137,6 +137,8 @@ const Home: NextPage = () => {
 
   const handleCentralLoginMessage = useCallback(
     (event: MessageEvent) => {
+      if (event.origin !== centralLoginSiteDomain) return; // só aceita mensagens do domínio central
+
       if (event.data.action === "checkLoginResponse") {
         // Se a central retornou que existe um login criado lá, então faz login aqui
         if (event.data.param) return doLogin(event.data.param);
