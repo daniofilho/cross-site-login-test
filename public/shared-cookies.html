@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shared Cookies</title>
+  </head>
+  <body>
+    <script>
+      // Em prod, não esqueça de configurar os domínios que precisam ser aceitos
+      const PERMITTED_DOMAIN = [
+        "https://quiet-octopus-12.loca.lt/",
+        "https://green-catfish-72.loca.lt/",
+        "https://fast-ladybug-37.loca.lt",
+      ];
+
+      const cookieName = "SHARED-LOGIN-COOKIE-NAME";
+
+      const getCookie = (name) => {
+        var dc = document.cookie;
+        var prefix = name + "=";
+        var begin = dc.indexOf("; " + prefix);
+        if (begin == -1) {
+          begin = dc.indexOf(prefix);
+          if (begin != 0) return null;
+        } else {
+          begin += 2;
+          var end = document.cookie.indexOf(";", begin);
+          if (end == -1) {
+            end = dc.length;
+          }
+        }
+        // because unescape has been deprecated, replaced with decodeURI
+        //return unescape(dc.substring(begin + prefix.length, end));
+        return decodeURI(dc.substring(begin + prefix.length, end));
+      };
+
+      // Recebe mensagem de outros domínios
+      window.addEventListener("message", function (event) {
+        // HABILITAR FORA DE LOCALHOST
+        // if (!PERMITTED_DOMAIN.includes(event.origin)) return;
+
+        console.log(event.data.action, event.data.param); // debug
+
+        // # Salva o token de login
+        if (event.data.action === "signIn") {
+          document.cookie = `${cookieName}=${event.data.param}`;
+        }
+
+        // # Faz logout
+        if (event.data.action === "signOut") {
+          document.cookie = `${cookieName}=`;
+        }
+
+        // # Retorna o token de login salvo
+        if (event.data.action === "checkLogin") {
+          event.source.postMessage(
+            {
+              action: "checkLoginResponse",
+              param: getCookie(cookieName) || null,
+            },
+            event.origin
+          );
+        }
+      });
+    </script>
+  </body>
+</html>
