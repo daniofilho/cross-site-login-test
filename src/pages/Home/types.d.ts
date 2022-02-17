@@ -3,5 +3,5 @@ export type ComponentProps = {
   userToken: string | null;
 
   signIn: (email: string) => Promise<void>;
-  signOut: () => void;
+  signOut: (silent?: boolean) => void;
 };

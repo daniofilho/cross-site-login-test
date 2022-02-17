@@ -5,7 +5,7 @@ import { ComponentProps } from "./types";
 
 import { centralLoginSiteDomain } from "../../../config";
 
-import styles from "../../../styles/Home.module.css";
+import { Container } from "./styles";
 
 const Component: NextPage<ComponentProps> = ({
   isLoading,
@@ -22,15 +22,15 @@ const Component: NextPage<ComponentProps> = ({
 
   if (isLoading)
     return (
-      <div className={styles.container}>
+      <Container>
         <p>Carregando...</p>
-      </div>
+      </Container>
     );
 
   if (userToken)
     return (
-      <div className={styles.container}>
-        {isCentralSite && <h2>SiteCentral</h2>}
+      <Container>
+        <h2>{isCentralSite ? "Site Central" : "Site Secundário"}</h2>
         <p>Logado!</p>
         <p>
           Token: <code>{userToken}</code>
@@ -38,24 +38,38 @@ const Component: NextPage<ComponentProps> = ({
         <button type="button" onClick={() => signOut()}>
           Sair
         </button>
-      </div>
+      </Container>
     );
 
   return (
-    <div className={styles.container}>
-      {isCentralSite && <h2>SiteCentral</h2>}
-      <p>Insira seu login para fazer entrar</p>
+    <Container>
+      <h2>{isCentralSite ? "Site Central" : "Site Secundário"}</h2>
 
-      <input
-        type="text"
-        value={login}
-        onChange={(e) => setLogin(e.target.value)}
-      />
+      <section>
+        <div>
+          <p>Insira seu login para entrar</p>
 
-      <button type="button" onClick={() => signIn(login)}>
-        Login
-      </button>
-    </div>
+          <input
+            type="text"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+          />
+
+          <button type="button" onClick={() => signIn(login)}>
+            Login
+          </button>
+        </div>
+
+        <div>
+          <p>ou</p>
+        </div>
+
+        <div>
+          <p>Faça login com:</p>
+          <div id="login-with-central-div" />
+        </div>
+      </section>
+    </Container>
   );
 };
 export default Component;

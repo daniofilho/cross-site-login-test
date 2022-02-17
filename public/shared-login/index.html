@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login pela Central</title>
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <article>
+      <header>Fazer login com <strong>Site Central</strong></header>
+      <form>
+        <h1>Fazer Login</h1>
+
+        <p>
+          Insira seu e-mail para fazer<br />
+          login em <strong id="parent-site-name"></strong>:
+        </p>
+
+        <input type="text" id="input-login" />
+
+        <button
+          type="button"
+          id="button-login"
+          onclick="loginController.signIn()"
+        >
+          Login
+        </button>
+      </form>
+    </article>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

@@ -1,1 +1,1 @@
-export const centralLoginSiteDomain = "https://soft-wasp-88.loca.lt";
+export const centralLoginSiteDomain = "https://black-eel-98.loca.lt";

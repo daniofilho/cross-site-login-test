@@ -111,13 +111,20 @@ const Home: NextPage = () => {
     [doLogin, sendCentralLoginMessage]
   );
 
-  const signOut = useCallback(() => {
-    removeCookie(cookieName);
-    setUserToken(null);
-    return sendCentralLoginMessage({
-      action: "signOut",
-    });
-  }, [removeCookie, sendCentralLoginMessage]);
+  const signOut = useCallback(
+    (silent?: boolean) => {
+      removeCookie(cookieName);
+      setUserToken(null);
+      sendCentralLoginMessage({
+        action: "signOut",
+      });
+      // Precisa atualizar a página para que o botão de Login pela central seja reconstruído
+      if (silent) return;
+      if (typeof window === "undefined") return false;
+      window.location.reload();
+    },
+    [removeCookie, sendCentralLoginMessage]
+  );
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -145,7 +152,13 @@ const Home: NextPage = () => {
 
         // caso contrário, desloga aqui também porque o usuário precisa estar logado na central também
         // Pode ser que ele tenha feito log out em outro site, então esse site aqui precisa respeitar isso e deslogar também
-        return signOut();
+        return signOut(true);
+      }
+
+      // # Se o login foi feito o site via Popup, então recebe o token e faz login dele aqui
+      if (event.data.action === "sucessLoggedIn") {
+        // Se a central retornou que existe um login criado lá, então faz login aqui
+        if (event.data.param) return doLogin(event.data.param);
       }
     },
     [doLogin, signOut]
