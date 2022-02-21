@@ -1,13 +1,6 @@
 import type { NextPage } from "next";
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 
 import { centralLoginSiteDomain } from "../../../config";
@@ -27,31 +20,21 @@ const Home: NextPage = () => {
 
   const hasCheckedCentralForLogin = useRef<boolean>(false);
 
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  // Cria o controller para eventos de cross login
-  const setCrossLoginController = useCallback(() => {
-    if (!window.location.origin) return;
-
-    // o tipo deveria ser HTMLIFrameElement, mas a função getElementById não está com isso declarado (mesmo retornando corretamente parao iframe)
-    // Por este motivo declaro o iFrameDOM como any
-    const iFrameDOM: any = document.getElementById("central-login-iframe");
-    if (iFrameDOM) {
-      const iframeContentWindow = iFrameDOM.contentWindow;
-
-      if (iframeContentWindow)
-        crossLoginController.current = iframeContentWindow;
-    }
+  const isCentralSite = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return centralLoginSiteDomain === window.location.origin;
   }, []);
 
-  useLayoutEffect(() => {
-    setCrossLoginController();
-  }, [setCrossLoginController]);
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  useEffect(() => {
+    if (cookies[cookieName]) setUserToken(cookies[cookieName]);
+  }, [cookies]);
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   type CentralLoginMessage = {
-    action: "signIn" | "checkLogin" | "signOut";
+    action: "signIn" | "signOut";
     param?: string;
   };
   const sendCentralLoginMessage = useCallback(
@@ -61,6 +44,7 @@ const Home: NextPage = () => {
         crossLoginController.current &&
         crossLoginController.current.postMessage
       ) {
+        console.log("Home: enviando ", action, param);
         // # https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
         return crossLoginController.current.postMessage(
           { action, param },
@@ -128,23 +112,13 @@ const Home: NextPage = () => {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  const checkIfUserIsLogged = useCallback(async () => {
-    // Verifica internamente
-    if (cookies[cookieName]) setUserToken(cookies[cookieName]);
-
-    // envia uma chamada para o site central responder se existe algum login criado
-    // mas faz isso apenas 1 vez
-    if (hasCheckedCentralForLogin.current) return;
-
-    hasCheckedCentralForLogin.current = true;
-    return sendCentralLoginMessage({
-      action: "checkLogin",
-    });
-  }, [cookies, sendCentralLoginMessage]);
-
   const handleCentralLoginMessage = useCallback(
     (event: MessageEvent) => {
+      console.log("Home: ", event.data); // debug
+
       if (event.origin !== centralLoginSiteDomain) return; // só aceita mensagens do domínio central
+
+      console.log("Home: passou pela validação de segurança");
 
       if (event.data.action === "checkLoginResponse") {
         // Se a central retornou que existe um login criado lá, então faz login aqui
@@ -165,23 +139,37 @@ const Home: NextPage = () => {
   );
 
   useEffect(() => {
-    checkIfUserIsLogged();
-
     window.addEventListener("message", handleCentralLoginMessage);
     return () => {
       window.removeEventListener("message", handleCentralLoginMessage);
     };
-  }, [checkIfUserIsLogged, handleCentralLoginMessage]);
+  }, [handleCentralLoginMessage]);
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  useEffect(() => {
+    const iFrameDOM: any = document.getElementById("central-login-iframe");
+
+    if (iFrameDOM && !isCentralSite) {
+      const iframeContentWindow = iFrameDOM.contentWindow;
+
+      if (iframeContentWindow)
+        crossLoginController.current = iframeContentWindow;
+    }
+  }, [isCentralSite]);
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   return (
-    <View
-      isLoading={isLoading}
-      userToken={userToken}
-      signIn={signIn}
-      signOut={signOut}
-    />
+    <>
+      <View
+        isLoading={isLoading}
+        userToken={userToken}
+        signIn={signIn}
+        signOut={signOut}
+        isCentralSite={isCentralSite}
+      />
+    </>
   );
 };
 

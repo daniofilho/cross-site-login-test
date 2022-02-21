@@ -22,8 +22,8 @@ Projeto criado para testar login automático entre sites de diferentes domínios
 
 Agora você terá multiplos domínios rodando apontando para o projeto.
 
-4. Vá nos arquivos `config.ts` e `public/shared-login/embed.js` e configure o domínio do projeto que será o login central.
+4. Vá nos arquivos `config.ts`, `public/config.js`, `public/shared-login/embed.js` e configure o domínio do projeto que será o login central.
 
-5. (Caso esteja em produção) Vá nos arquivos `/public/shared-cookies.html` e `public/shared-login/script.js` e adicione os domínios que foram gerados para que o projeto central aceite as conexões.
+5. (Caso esteja em produção) Vá nos arquivos `/public/config.js` e adicione os domínios que foram gerados para que o projeto central aceite as conexões.
 
 Tudo pronto para os testes.

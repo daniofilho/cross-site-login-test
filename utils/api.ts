@@ -1,7 +1,8 @@
 import axios from "axios";
+import { apiURL } from "../config";
 
 const api = axios.create({
-  baseURL: "https://api-mocks.vercel.app/api",
+  baseURL: apiURL,
 });
 
 export default api;

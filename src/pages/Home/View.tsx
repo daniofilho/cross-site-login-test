@@ -10,15 +10,11 @@ import { Container } from "./styles";
 const Component: NextPage<ComponentProps> = ({
   isLoading,
   userToken,
+  isCentralSite,
   signIn,
   signOut,
 }) => {
   const [login, setLogin] = useState<string>("");
-
-  const isCentralSite = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    return centralLoginSiteDomain === window.location.origin;
-  }, []);
 
   if (isLoading)
     return (
@@ -47,7 +43,7 @@ const Component: NextPage<ComponentProps> = ({
 
       <section>
         <div>
-          <p>Insira seu login para entrar</p>
+          <p>Insira seu login para entrar neste site:</p>
 
           <input
             type="text"
@@ -60,14 +56,18 @@ const Component: NextPage<ComponentProps> = ({
           </button>
         </div>
 
-        <div>
-          <p>ou</p>
-        </div>
+        {!isCentralSite && (
+          <>
+            <div>
+              <p>ou</p>
+            </div>
 
-        <div>
-          <p>Faça login com:</p>
-          <div id="login-with-central-div" />
-        </div>
+            <div>
+              <p>Faça login por um site terceiro:</p>
+              <div id="login-with-central-div" />
+            </div>
+          </>
+        )}
       </section>
     </Container>
   );

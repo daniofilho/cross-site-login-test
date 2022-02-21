@@ -58,3 +58,33 @@ input:hover {
   margin: 1px 1px 0 1px;
   padding: 5px 10px;
 }
+
+.div-logged-in {
+  display: none;
+}
+
+.logged-in .div-logged-in {
+  display: block;
+}
+.logged-in .div-logged-out {
+  display: none;
+}
+
+/* loading */
+
+article {
+  display: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+}
+
+.loaded .loading {
+  display: none;
+}
+
+.loaded article {
+  display: block;
+}
